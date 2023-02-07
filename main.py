@@ -76,14 +76,35 @@ def on_button_click():
         "Summary":{"rich_text": [{"text": {"content": result["summary"]}}]},
         "Found_date": {'id': 'uj%7Dj', 'type': 'date', 'date': {'start': date_str}},
         "Tags": {'multi_select': [{ 'name': 'TAG_ME'}]}, 
+
     }
+
+    row_page_body = [
+        {
+			"object": "block",
+			"type": "paragraph",
+			"paragraph": {
+				"rich_text": [
+					{
+						"type": "text",
+						"text": {
+							"content": contents,
+						}
+					}
+				]
+			}
+        }
+
+    ]
     #print(json.dumps(new_row))
 
     response = requests.post(
     "https://api.notion.com/v1/pages",
     headers={"Authorization": f"Bearer {notion_api_key}",'Notion-Version': '2022-06-28'},
     json={"parent": { "database_id": database_id },
-        "properties": new_row}
+        "properties": new_row,
+        "children":row_page_body,
+        }
     )
 
     # Check the response status code to see if the request was successful
