@@ -1,0 +1,5 @@
+/config copy.ini
+/get_data_base_info.py
+/query_database.py
+/temp.txt
+/temp_database_info.json
