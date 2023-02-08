@@ -2,8 +2,11 @@ import openai
 import json
 import requests
 import configparser
-
+import pyperclip
 import datetime
+
+#for installing packages
+#pip install -r requirements.txt
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -34,7 +37,7 @@ database_id = config['DEFAULT']['notion_database_id']
 import tkinter as tk
 
 root = tk.Tk()
-root.geometry("400x200")
+root.geometry("400x250")
 
 label = tk.Label(root, text="Enter text:")
 label.pack()
@@ -45,6 +48,7 @@ text.pack()
 def on_button_click():
     contents = text.get("1.0", "end")
     print(contents)
+    label.config(text="Calling openai...")
     response = openai.Completion.create(
               model="text-davinci-003",
               prompt=prompt+contents,
@@ -97,7 +101,7 @@ def on_button_click():
 
     ]
     #print(json.dumps(new_row))
-
+    label.config(text="Calling notion...")
     response = requests.post(
     "https://api.notion.com/v1/pages",
     headers={"Authorization": f"Bearer {notion_api_key}",'Notion-Version': '2022-06-28'},
@@ -111,11 +115,24 @@ def on_button_click():
     print(f"response is {response.status_code}")
     if response.status_code == 200:
         print("Row inserted successfully")
+        label.config(text="OK. Enter new content:")
+        #text.delete("1.0", tk.END)
     else:
         print("Failed to insert row")
         print(f"response is {response.text}")
+        label.config(text=f"Failed: {response.text}")
 
 button = tk.Button(root, text="Submit", command=on_button_click)
 button.pack()
+
+def paste_text():
+    text_input = text
+    content = pyperclip.paste()
+    text_input.delete("1.0", tk.END)
+    text_input.insert("1.0", content)
+    on_button_click()
+
+paste_button = tk.Button(root, text="Paste and Go", command=paste_text)
+paste_button.pack()
 
 root.mainloop()

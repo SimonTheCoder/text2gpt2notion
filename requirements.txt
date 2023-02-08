@@ -1,0 +1,6 @@
+openai
+json
+requests
+configparser
+pyperclip
+datetime
