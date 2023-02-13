@@ -17,7 +17,7 @@ api_key = config['DEFAULT']['api_key']
 openai.api_key = api_key
 
 # Define the text to be analyzed
-prompt = """请理解下面给出的信息，并给出各条内容的title、url和summary。结果以json显示，key用英文，value尽量使用中文, 多个结果的情况下以array存放。信息："""
+prompt = """根据信息给出各条内容的title、url和summary。结果以json给出，key用英文，value尽量使用中文, 所有结果以array存放。忽略json以外内容。信息："""
 
 # test_text = """• oss-security - double-free vulnerability in OpenSSH server 9.1:
 # https://www.openwall.com/lists/oss-security/2023/02/02/2
