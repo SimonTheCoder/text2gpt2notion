@@ -17,7 +17,7 @@ api_key = config['DEFAULT']['api_key']
 openai.api_key = api_key
 
 # Define the text to be analyzed
-prompt = """根据信息给出各条内容的title、url和summary。结果以json给出，key用英文，value尽量使用中文, 所有结果以array存放。忽略json以外内容。信息："""
+prompt = """根据信息给出各条内容的title、url和summary，title尽量简洁。结果以json给出，所有key用英文，summary的value尽量使用中文。如有多个结果放进array。忽略json以外内容。信息："""
 
 # test_text = """• oss-security - double-free vulnerability in OpenSSH server 9.1:
 # https://www.openwall.com/lists/oss-security/2023/02/02/2
@@ -47,6 +47,32 @@ label.pack()
 text = tk.Text(root, height=10, width=40)
 text.pack()
 
+def extract_json_objects(text):
+    json_objects = []
+    pos = 0
+    while True:
+        start = text.find('{', pos)
+        if start == -1:
+            break
+        try:
+            end = json.JSONDecoder().raw_decode(text[start:])[1] + start
+            json_objects.append(json.loads(text[start:end]))
+        except json.JSONDecodeError:
+            pass
+        pos = start + 1
+    return json_objects
+
+def remove_duplicates(lst):
+    seen = set()
+    result = []
+    for d in lst:
+        t = tuple(sorted(d.items()))
+        if t not in seen:
+            seen.add(t)
+            result.append(d)
+    return result
+
+
 def on_button_click():
     contents = text.get("1.0", "end")
     print(contents)
@@ -70,8 +96,8 @@ def on_button_click():
     # with open("temp.txt","rb") as f:
     #     result_json = f.read()
 
-    result_list = json.loads(result_json)
-
+    result_list = extract_json_objects(result_json)
+    result_list = remove_duplicates(result_list)
     for result in result_list:
         print(result)
 
