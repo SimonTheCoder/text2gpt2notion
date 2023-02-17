@@ -1,4 +1,4 @@
-# text2notion 说明
+# text2gpt2notion 说明
 这是一个可以帮助我们将信息整理成notion database的小工具。
 
 主要是利用openai的gpt3 API来分析文本，生成结构化数据。再利用notion API 在指定的database中建立相应的page。
