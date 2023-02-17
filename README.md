@@ -7,6 +7,8 @@
 
 各位，玩得愉快。
 
+demo: https://youtu.be/pEQUao6TJts
+
 ## English
 This is a small tool that helps us organize information into a Notion database. 
 
