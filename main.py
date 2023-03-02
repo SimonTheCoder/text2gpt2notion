@@ -10,6 +10,8 @@ import datetime
 #for installing packages
 #pip install -r requirements.txt
 
+USING_MODEL="gpt-3.5-turbo"
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -76,40 +78,79 @@ def remove_duplicates(lst):
 def on_button_click():
     contents = text.get("1.0", "end")
     print(contents)
+
+    # prompt = """Summarize given content, output a json string like '[{"title":"title","url":"url1","summary":"summary1","tag":["tag1","tag2"]},{"title":"title2","url":"url2","summary":"summary2"}]'
+    # And try to use Chinese in the summary object.
+    # content:
+    # """
+    prompt = """Summarize given content, output a json string like '[{"title":"title","url":"url1","summary":"summary1","tag":["tag1","tag2"]},]'
+    Try to use Chinese in the summary object. 
+    Try to tag with this list of tags:[AI, vulnerable, tool, pager, reverse engineering, pentesting, web, binary ].
+    content:
+    """
     label.config(text="Calling openai...")
-    response = openai.Completion.create(
-              model="text-davinci-003",
-              prompt=prompt+contents,
-              max_tokens=2000,
-              temperature=0
-            )
 
-    print(response)
+    if USING_MODEL == "gpt-3.5-turbo":
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "user", "content": prompt+contents}
+            ]
+        )
+
+        print(response)
+        result_json = response["choices"][0]["message"]["content"]
+
+        
+        with open("temp.txt","wb") as f:
+            f.write(result_json.encode("utf-8"))
+
+        # with open("temp.txt","rb") as f:
+        #     result_json = f.read()
+
+        result_list = extract_json_objects(result_json)
+        #result_list = remove_duplicates(result_list)
+    else:
+        response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt+contents,
+                max_tokens=2000,
+                temperature=0
+                )
+
+        print(response)
 
 
-    result_json = response["choices"][0]["text"]
+        result_json = response["choices"][0]["text"]
 
 
-    with open("temp.txt","wb") as f:
-        f.write(result_json.encode("utf-8"))
+        with open("temp.txt","wb") as f:
+            f.write(result_json.encode("utf-8"))
 
-    # with open("temp.txt","rb") as f:
-    #     result_json = f.read()
+        # with open("temp.txt","rb") as f:
+        #     result_json = f.read()
 
-    result_list = extract_json_objects(result_json)
-    result_list = remove_duplicates(result_list)
+        result_list = extract_json_objects(result_json)
+        result_list = remove_duplicates(result_list)
+
     for result in result_list:
         print(result)
 
         #notion row
         today = datetime.datetime.today()
         date_str = today.strftime("%Y-%m-%d")
+
+        tags = [{ 'name': 'TAG_ME'}]
+        if result.get("tag") is not None:
+            for tag in result.get("tag"):
+                tags.append({'name':tag})
+
         new_row = {
             "Title": {"title": [{"text": {"content": result["title"]}}]},
             "URL": {"url": result["url"]},
             "Summary":{"rich_text": [{"text": {"content": result["summary"]}}]},
             "Found_date": {'id': 'uj%7Dj', 'type': 'date', 'date': {'start': date_str}},
-            "Tags": {'multi_select': [{ 'name': 'TAG_ME'}]}, 
+            "Tags": {'multi_select': tags}, 
 
         }
 
