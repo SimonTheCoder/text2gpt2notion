@@ -83,10 +83,16 @@ def on_button_click():
     # And try to use Chinese in the summary object.
     # content:
     # """
-    prompt = """Summarize given content, output a json string like '[{"title":"title","url":"url1","summary":"summary1","tag":["tag1","tag2"]},]'
-    Try to use Chinese in the summary object. 
-    Try to tag with this list of tags:[AI, vulnerable, tool, pager, reverse engineering, pentesting, web, binary ].
-    content:
+    # prompt = """Summarize given content, output a json string like '[{"title":"title","url":"url1","summary":"summary1","tag":["tag1","tag2"]},]'
+    # Try to use Chinese in the summary object. 
+    # Try to tag with this list of tags:[AI, vulnerable, tool, pager, reverse engineering, pentesting, web, binary ].
+    # content:
+    # """
+
+    prompt = """总结指定内容,输出json,如 '[{"title":"title","url":"url1","summary":"summary1","tag":["tag1","tag2"]},]'
+    summary尽量用中文. 
+    使用标签列表:[AI, vulnerable, tool, pager, reverse engineering, pentesting, web, binary ].
+    内容:
     """
     label.config(text="Calling openai...")
 
